@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name: 'SignUp', 
     data(){
@@ -45,6 +46,43 @@ export default {
             password: '',
             password2: '',
             errors: [],
+        }
+    },
+    methods:{
+        submitform(){
+            this.errors = []
+
+            if(this.username === ''){
+                this.errors.push('The username is missing')
+            }
+            if(this.password === '' || this.password2 === ''){
+                this.errors.push('The password is missing')
+            }
+            if(this.password2 !== this.password){
+                this.errors.push('The passowords dosen\'t match')
+            }
+            if(!this.errors.length){
+                console.log('aaaaaaaaaa')
+                const formData = {
+                    username: this.username,
+                    password: this.password
+                }
+                axios 
+                    .post("/api/v1/users/", formData)
+                    .then(response=>{
+                        this.$router.push('/')
+                    })
+                    .catch(error=>{
+                        if(error.response){
+                            for(const property in error.response.data){
+                                this.errors.push(`${property}: ${error.response.data[property]}`)
+                            }
+                        }
+                        else if(error.message){
+                            this.errors.push('something went wrong, please try again')
+                        }
+                    })
+            }
         }
     }
 }
